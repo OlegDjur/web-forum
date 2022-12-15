@@ -1,0 +1,37 @@
+{{ define "title" }}Create Post{{ end }} {{ define "content" }}
+<form role="form" method="POST" action="/edit">
+  <input type="hidden" name="id" value="{{.Post.Id}}" />
+  <div class="input-group input-group-lg">
+    <span class="input-group-text" id="inputGroup-sizing-lg">Title</span>
+    <input
+      class="form-control"
+      aria-label="Sizing example input"
+      aria-describedby="inputGroup-sizing-lg"
+      type="text"
+      name="title"
+      id="title"
+      value="{{.Post.Title}}"
+    />
+  </div>
+
+  <div class="form-floating">
+    <textarea
+      class="form-control create-post"
+      placeholder="Leave a comment here"
+      name="content"
+      id="content"
+      style="height: 800px"
+    >
+{{.Post.Content}}</textarea
+    >
+    <label for="floatingTextarea2">Topic</label>
+  </div>
+  <button class="btn btn-primary" type="submit">Submit</button>
+</form>
+<div class="col-xs-4">
+  {{ if .Post.Id }}
+  <a href="/delete?id={{.Post.Id}}">Delete</a>
+  {{ end }}
+</div>
+
+{{ end }}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      rel="stylesheet"
+      href="https://unicons.iconscout.com/release/v4.0.0/css/line.css"
+    />
+
+    <link rel="stylesheet" href="../static/css/newLogin.css" />
+  </head>
+  <body>
+    <div class="container active">
+      <div class="forms">
+        <div class="form signup">
+          <span class="title">Registration</span>
+
+          <form method="POST" action="/sign-up">
+            {{ if .ErrorMessage }}
+            <div class="alert alert-danger" role="alert">
+              {{ .ErrorMessage }}
+            </div>
+            {{ end }}
+            <div class="input-field">
+              <input
+                type="text"
+                placeholder="Enter your name"
+                name="form-username"
+                required
+              />
+              <i class="uil uil-user"></i>
+            </div>
+            <div class="input-field">
+              <input
+                type="text"
+                placeholder="Enter your email"
+                name="form-email"
+                required
+              />
+              <i class="uil uil-envelope icon"></i>
+            </div>
+
+            <div class="input-field">
+              <input
+                type="password"
+                class="password"
+                placeholder="Create a password"
+                name="form-password"
+                required
+              />
+              <i class="uil uil-lock icon"></i>
+              <i class="uil uil-eye-slash showHidePw"></i>
+            </div>
+
+            <div class="input-field button">
+              <input type="submit" value="Signup" />
+            </div>
+          </form>
+
+          <div class="login-signup">
+            <span class="text"
+              >Already a member?
+              <a href="/sign-in" class="text login-link">Login Now</a>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../static/js/login.js"></script>
+  </body>
+</html>

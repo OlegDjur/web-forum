@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<!-- Created by CodingLab |www.youtube.com/CodingLabYT-->
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <!--<title> Drop Down Sidebar Menu | CodingLab </title>-->
+    <link rel="stylesheet" href="../static/css/newStyle.css" />
+    <!-- Boxiocns CDN Link -->
+    <link
+    href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../static/css/virtual-select.min.css">
+  </head>
+  <body>
+    <div class="sidebar close">
+      <a href="/">
+        <div class="logo-details">
+          <i class="bx bxl-c-plus-plus"></i>
+          <span class="logo_name">CodingLab</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        {{ if not .User.ID}}
+        <li class="login">
+          <a href="/sign-in">
+            <i class="bx bx-log-in-circle"></i>
+            <span class="link_name">Login</span>
+          </a>
+        </li>
+        {{else}}
+        <li class="login">
+          <a href="/logout">
+            <i class="bx bx-log-in-circle"></i>
+            <span class="link_name">Logout</span>
+          </a>
+        </li>
+        {{end}} {{ if .User.ID }}
+        <li class="write">
+          <a href="/create-post">
+            <i class="bx bx-edit"></i>
+            <span class="link_name">Create post</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            <i class="bx bx-grid-alt"></i>
+            <span class="link_name">Dashboard</span>
+          </a>
+          <ul class="sub-menu blank">
+            <li><a class="link_name" href="#">Dashboard</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="iocn-link">
+            <a href="#">
+              <i class="bx bx-book-alt"></i>
+              <span class="link_name">Filter</span>
+            </a>
+            <i class="bx bxs-chevron-down arrow"></i>
+          </div>
+          <ul class="sub-menu">
+            <li><a class="link_name" href="#">Filter</a></li>
+            <li><a href="/get-created-posts/">Date of creation</a></li>
+            <li>
+              <a href="/get-liked-posts/">Liked post</a>
+            </li>
+          </ul>
+        </li>
+        {{ end }}
+
+        <li>
+          <div class="iocn-link">
+            <a href="#">
+              <i class="bx bx-collection"></i>
+              <span class="link_name">Category</span>
+            </a>
+            <i class="bx bxs-chevron-down arrow"></i>
+          </div>
+          <ul class="sub-menu">
+            <li><a class="link_name" href="#">Category</a></li>
+            <li><a href="/get-posts-by-category?category=Golang">Golang</a></li>
+            <li>
+              <a href="get-posts-by-category?category=html&css">HTML & CSS</a>
+            </li>
+            <li>
+              <a href="get-posts-by-category?category=JavaScript">JavaScript</a>
+            </li>
+            <li><a href="get-posts-by-category?category=Docker">Docker</a></li>
+            <li><a href="get-posts-by-category?category=SQL">SQL</a></li>
+          </ul>
+        </li>
+
+        {{ if .User.ID }}
+        <li>
+          <div class="profile-details">
+            <div class="profile-content">
+              <!--<img src="image/profile.jpg" alt="profileImg">-->
+            </div>
+            <div class="name-job">
+              <div class="profile_name">{{ .User.Username }}</div>
+              <div class="job">Golang Developer</div>
+            </div>
+            <a href="/logout" class="btn btn-secondary"
+              ><i class="bx bx-log-out"></i
+            ></a>
+          </div>
+        </li>
+        {{ end }}
+      </ul>
+    </div>
+
+    <section class="home-section">
+      <div class="home-content">
+        <i class="bx bx-menu"></i>
+        <span class="text">Drop Down Sidebar</span>
+      </div>
+      <div class="container">
+       
+
+          <form class="create-post-form" role="form" method="POST" action="/create-post">
+            <input type="hidden" name="id" value="{{.Post.Id}}" />
+            <input type="hidden" name="user-id" value="{{.User.ID}}" />
+              <div class="form-group">
+                <span class="categories-title">Categories</span>
+
+                <div>
+                  <select id="multipleSelect" multiple name="category" placeholder="Native Select" data-search="false" data-silent-initial-value-set="true" required>
+                    <option value="Golang">Golang</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="Pytjon">Option 3</option>
+                    <option value="Docker">Docker</option>
+                    <option value="SQL">SQL</option>
+                  </select>
+                </div>
+
+                                   
+            <div class="create-post_input">
+              
+
+                <span class="create-post_text">Title</span>
+                <input
+                  class="create-title create-input"
+                  aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-lg"
+                  type="text"
+                  name="title"
+                  id="title"
+                  value="{{.Post.Title}}"
+                  required
+                />
+              
+            </div>
+  
+            <div class="create-post_input" style="height: 150px">
+              <span class="create-post_text">Description</span>
+              <textarea
+                class="create-description create-input"
+                aria-label="With textarea"
+                resize: "none"
+                name="about"
+                required
+                style="height: 150px"></textarea>
+            </div>
+  
+            <div class="create-post_input">
+              <span class="create-post_text">Topic</span>
+              <textarea
+                class="create-content create-input"
+                name="content"
+                id="content"
+                required
+              >{{.Post.Content}}</textarea>
+            </div>
+            
+            <button class="button">Post Reply</button>
+            
+          </form>
+        
+      </div>
+    </section>
+    <script>
+      let arrow = document.querySelectorAll(".arrow");
+      for (var i = 0; i < arrow.length; i++) {
+        arrow[i].addEventListener("click", (e) => {
+          let arrowParent = e.target.parentElement.parentElement; //selecting main parent of arrow
+          arrowParent.classList.toggle("showMenu");
+        });
+      }
+      let sidebar = document.querySelector(".sidebar");
+      let sidebarBtn = document.querySelector(".bx-menu");
+      console.log(sidebarBtn);
+      sidebarBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("close");
+      });
+      // const optionMenu = document.querySelector(".select-menu"),
+      //       selectBtn = optionMenu.querySelector(".select-btn"),
+      //       options = optionMenu.querySelectorAll(".option"),
+      //       sBtn_text = optionMenu.querySelector(".sBtn-text"),
+      //       input_category = optionMenu.querySelector("#category");
+
+      // selectBtn.addEventListener("click", () => optionMenu.classList.toggle("active"))
+
+      // options.forEach(option =>{
+      //   option.addEventListener("click", () =>{
+      //     let selectedOption = option.querySelector(".option-text").innerText;
+      //     sBtn_text.innerText = selectedOption;
+      //     input_category.value = selectedOption;
+      //     optionMenu.classList.toggle("active")
+      //   })
+      // })
+
+      // let arrow = document.querySelectorAll(".arrow");
+      // for (var i = 0; i < arrow.length; i++) {
+      //   arrow[i].addEventListener("click", (e) => {
+      //     let arrowParent = e.target.parentElement.parentElement; //selecting main parent of arrow
+      //     arrowParent.classList.remove("showMenu");
+      //   });
+      // }
+      // let sidebar = document.querySelector(".sidebar");
+      // let sidebarBtn = document.querySelector(".bx-menu");
+      // console.log(sidebarBtn);
+      // sidebarBtn.addEventListener("click", () => {
+      //   sidebar.classList.toggle("close");
+      // });
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
+    <script type="text/javascript">$(".chosen-select").chosen({disable_search_threshold: 10});</script>
+
+
+    <script src="../static/js/virtual-select.min.js"></script>
+    <script>VirtualSelect.init({ 
+      ele: '#multipleSelect' 
+    });</script>
+  </body>
+</html>

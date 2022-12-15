@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<!-- Created by CodingLab |www.youtube.com/CodingLabYT-->
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <!--<title> Drop Down Sidebar Menu | CodingLab </title>-->
+    <link rel="stylesheet" href="../static/css/newStyle.css" />
+    <!-- Boxiocns CDN Link -->
+    <link
+      href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div class="sidebar close">
+      <a href="/">
+        <div class="logo-details">
+          <i class="bx bxl-c-plus-plus"></i>
+          <span class="logo_name">CodingLab</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        {{ if not .User.ID}}
+        <li class="login">
+          <a href="/sign-in">
+            <i class="bx bx-log-in-circle"></i>
+            <span class="link_name">Login</span>
+          </a>
+        </li>
+        {{else}}
+        <li class="login">
+          <a href="/logout">
+            <i class="bx bx-log-in-circle"></i>
+            <span class="link_name">Logout</span>
+          </a>
+        </li>
+        {{end}}
+        <li>
+          <a href="/">
+            <i class="bx bx-home"></i>
+            <span class="link_name">Home page</span>
+          </a>
+          <ul class="sub-menu blank">
+            <li><a class="link_name" href="#">Home page</a></li>
+          </ul>
+        </li>
+        <li>{{ if .User.ID }}</li>
+
+        <li class="write">
+          <a href="/create-post">
+            <i class="bx bx-edit"></i>
+            <span class="link_name">Create post</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            <i class="bx bx-grid-alt"></i>
+            <span class="link_name">Dashboard</span>
+          </a>
+          <ul class="sub-menu blank">
+            <li><a class="link_name" href="#">Dashboard</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="iocn-link">
+            <a href="#">
+              <i class="bx bx-book-alt"></i>
+              <span class="link_name">Filter</span>
+            </a>
+            <i class="bx bxs-chevron-down arrow"></i>
+          </div>
+          <ul class="sub-menu">
+            <li><a class="link_name" href="#">Filter</a></li>
+            <li><a href="/get-created-posts/">Date of creation</a></li>
+            <li>
+              <a href="/get-liked-posts/">Liked post</a>
+            </li>
+          </ul>
+        </li>
+        {{ end }}
+        <li>
+          <div class="iocn-link">
+            <a href="#">
+              <i class="bx bx-collection"></i>
+              <span class="link_name">Category</span>
+            </a>
+            <i class="bx bxs-chevron-down arrow"></i>
+          </div>
+          <ul class="sub-menu">
+            <li><a class="link_name" href="#">Category</a></li>
+            <li><a href="/get-posts-by-category?category=Golang">Golang</a></li>
+            <li>
+              <a href="get-posts-by-category?category=html&css">HTML & CSS</a>
+            </li>
+            <li>
+              <a href="get-posts-by-category?category=JavaScript">JavaScript</a>
+            </li>
+            <li><a href="get-posts-by-category?category=Docker">Docker</a></li>
+            <li><a href="get-posts-by-category?category=SQL">SQL</a></li>
+          </ul>
+        </li>
+
+        {{ if .User.ID }}
+        <li>
+          <div class="profile-details">
+            <div class="profile-content"></div>
+            <div class="name-job">
+              <div class="profile_name">{{ .User.Username }}</div>
+              <div class="job">Golang Developer</div>
+            </div>
+            <a href="/logout" class="btn btn-secondary"
+              ><i class="bx bx-log-out"></i
+            ></a>
+          </div>
+        </li>
+        {{ end }}
+      </ul>
+    </div>
+
+    <section class="home-section">
+      <div class="home-content">
+        <i class="bx bx-menu"></i>
+        <span class="text">Drop Down Sidebar</span>
+      </div>
+      <div class="container">
+        <div class="post-title">
+          <h1>{{.Post.Title}}</h1>
+        </div>
+        <div class="post-text-block">
+          <pre class="post-text">{{.Post.Content}}</pre>
+        </div>
+        <div class="likes-wrapper">
+          {{ if .User.Username }}
+          <form action="/like/{{ .Post.Id }}" method="POST">
+            <input type="hidden" name="username" value="{{.User.Username}}" />
+            <button class="like_btn">
+              <span id="icon"
+                ><i class="bx bxs-like"></i> {{ .Post.Like }}</span
+              >
+            </button>
+          </form>
+
+          <form action="/dislike/{{ .Post.Id }}" method="POST">
+            <input type="hidden" name="username" value="{{.User.Username}}" />
+            <button class="like_btn">
+              <span id="icon"
+                ><i class="bx bxs-dislike"></i> {{ .Post.DisLike }}</span
+              >
+              <span id="count" name="like"></span>
+            </button>
+          </form>
+
+          {{else}}
+          <div class="like_btn">
+            <span id="icon"><i class="bx bxs-like"></i> {{ .Post.Like }}</span>
+          </div>
+          <div class="like_btn">
+            <span id="icon"
+              ><i class="bx bxs-dislike"></i> {{ .Post.DisLike }}</span
+            >
+            <span id="count" name="like"></span>
+          </div>
+          {{end}}
+        </div>
+
+        <div class="comments">
+          {{if .User.Username}} {{range $element := .Comments}}
+          <div class="comment-wrapper">
+            <div class="comment">{{.Text}}</div>
+
+            <div class="comment-likes-wrapper">
+              <div class="like">
+                <form action="/comment-like/{{ $element.ID }}" method="POST">
+                  <input
+                    type="hidden"
+                    name="username"
+                    value="{{$element.Author}}"
+                  />
+                  <button class="like_btn">
+                    <span class="icon"
+                      ><i class="bx bxs-like"></i>{{ $element.Likes }}</span
+                    >
+                    <!-- <span id="count" name="like"></span>Like -->
+                  </button>
+                </form>
+              </div>
+
+              <form action="/comment-dislike/{{ $element.ID }}" method="POST">
+                <input
+                  type="hidden"
+                  name="username"
+                  value="{{$element.Author}}"
+                />
+                <button class="like_btn">
+                  <span class="icon"
+                    ><i class="bx bxs-dislike"></i> {{ $element.DisLikes
+                    }}</span
+                  >
+                  <span id="count" name="like"></span>
+                </button>
+              </form>
+            </div>
+          </div>
+          {{end}} {{else}} {{range $element := .Comments}}
+          <div class="comment-wrapper">
+            <div class="comment">{{.Text}}</div>
+
+            <div class="comment-likes-wrapper">
+              <div class="like">
+                <button class="like_btn">
+                  <span class="icon"
+                    ><i class="bx bxs-like"></i>{{ $element.Likes }}</span
+                  >
+                  <!-- <span id="count" name="like"></span>Like -->
+                </button>
+              </div>
+
+              <button class="like_btn">
+                <span class="icon"
+                  ><i class="bx bxs-dislike"></i> {{ $element.DisLikes }}</span
+                >
+                <span id="count" name="like"></span>
+              </button>
+            </div>
+          </div>
+          {{end}} {{end}}
+        </div>
+
+        {{ if .User.ID}}
+        <form class="comment-input" action="/create-comment" method="POST">
+          <input type="hidden" name="author" value="{{.User.Username}}" />
+          <input type="hidden" name="postid" value="{{.Post.Id}}" />
+          <!-- <div class="textarea-wrapper">
+
+          </div> -->
+          <textarea
+            class="post-comments-input"
+            placeholder="Enter a message"
+            name="input"
+            id="1"
+            cols="30"
+            rows="10"
+            wrap="hard"
+          ></textarea>
+          <div class="submit">
+            <button class="button">Post Reply</button>
+          </div>
+        </form>
+        {{end}}
+      </div>
+    </section>
+    <script>
+      let arrow = document.querySelectorAll(".arrow");
+      for (var i = 0; i < arrow.length; i++) {
+        arrow[i].addEventListener("click", (e) => {
+          let arrowParent = e.target.parentElement.parentElement; //selecting main parent of arrow
+          arrowParent.classList.toggle("showMenu");
+        });
+      }
+      let sidebar = document.querySelector(".sidebar");
+      let sidebarBtn = document.querySelector(".bx-menu");
+      console.log(sidebarBtn);
+      sidebarBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("close");
+      });
+    </script>
+  </body>
+</html>
