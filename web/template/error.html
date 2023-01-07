@@ -4,13 +4,17 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="#" type="image/x-icon">
     <link rel="stylesheet" href="../static/css/newStyle.css" />
     <title>Document</title>
   </head>
   <body>
     <div class="container">
-      <h2>{{.Status}}</h2>
-      <h3>{{.Message}}</h3>
+      <div class="wrapper">
+        <div><a class="error-link" href="/">Home</a></div>
+        <span>{{.Status}}</span>
+        <span>{{.Message}}</span>
+      </div>
     </div>
   </body>
 </html>

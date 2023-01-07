@@ -49,7 +49,7 @@ func (c *CommentService) LikeComment(commentID int, username string) error {
 		}
 		return nil
 	}
-	fmt.Print(1)
+
 	if err := c.repo.CommentHasDislike(commentID, username); err == nil {
 		if err := c.repo.RemoveDislikeComment(commentID, username); err != nil {
 			return fmt.Errorf("service: like comment: %w", err)
@@ -92,12 +92,12 @@ func isValidComment(comment *models.Comment) error {
 
 	for _, char := range comment.Text {
 		if (char != 13 && char != 10) && (char < 32 || char > 126) {
-			return fmt.Errorf("service: CreatePost: isValidComment err: %v", ErrInvalidComment)
+			return fmt.Errorf("service: CreatePost: isValidComment err: %w", ErrInvalidComment)
 		}
 	}
 
 	if comment.Text == "" {
-		return fmt.Errorf("service: CreatePost: isValidComment err: %v", ErrInvalidComment)
+		return fmt.Errorf("service: CreatePost: isValidComment err: %w", ErrInvalidComment)
 	}
 
 	return nil

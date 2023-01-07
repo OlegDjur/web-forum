@@ -3,9 +3,9 @@ package controller
 import (
 	"errors"
 	"forum/internal/models"
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
 	"time"
 
 	"forum/internal/service.go"
@@ -20,7 +20,6 @@ type LoginError struct {
 }
 
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
-	log.Println("/register", r.Method)
 	tmpl := template.Must(template.ParseFiles("web/template/registration.html"))
 
 	switch r.Method {
@@ -33,49 +32,56 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		email := r.FormValue("form-email")
 		password := r.FormValue("form-password")
 
-		if len(password) < 8 {
-			tmpl.Execute(w, RegisterError{
-				ErrorMessage: "Password must be at least 8 characters",
-			})
-			return
-		}
-
 		user := &models.User{
 			Email:    email,
 			Username: username,
 			Password: password,
 		}
 
-		err := h.services.Authorization.CreateUser(user)
-		if errors.Is(err, service.ErrInvalidEmail) ||
-			errors.Is(err, service.ErrInvalidUsername) {
-			w.WriteHeader(http.StatusBadRequest)
-			tmpl.Execute(w, RegisterError{
-				ErrorMessage: "The username or email already exists",
-			})
+		if err := h.services.Authorization.CreateUser(user); err != nil {
+			log.Printf("Sign Up: Create User: %v", err)
+			if errors.Is(err, service.ErrInvalidEmail) ||
+				errors.Is(err, service.ErrInvalidUsername) ||
+				errors.Is(err, service.ErrInvalidPassword) {
+				w.WriteHeader(http.StatusBadRequest)
+				tmpl.Execute(w, RegisterError{
+					ErrorMessage: "Invalid input data",
+				})
+				return
+			}
+			if errors.Is(err, service.ErrUserExist) {
+				w.WriteHeader(http.StatusBadRequest)
+				tmpl.Execute(w, RegisterError{
+					ErrorMessage: "The username or email already exists",
+				})
+				return
+			}
+			h.errorPage(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		http.Redirect(w, r, "/sign-in", http.StatusFound)
 	default:
+		log.Println("Sign Up: Method not allowed")
 		h.errorPage(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
 	}
 }
 
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
-	log.Println("/login", r.Method)
 	tmpl := template.Must(template.ParseFiles("web/template/login.html"))
 
-	if r.Method == "GET" {
-		tmpl.Execute(w, nil)
-		return
-	}
-
-	if r.Method != "POST" {
-		return
-	}
 	switch r.Method {
 	case http.MethodGet:
+		cookie, err := r.Cookie("sessionID")
+		if err != nil {
+			tmpl.Execute(w, nil)
+			return
+		}
+
+		if len(cookie.Value) != 0 {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
 		if err := tmpl.Execute(w, nil); err != nil {
 			h.errorPage(w, http.StatusInternalServerError, err.Error())
 		}
@@ -85,6 +91,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 
 		token, expiresAt, err := h.services.Authorization.GenerateSessionToken(email, password)
 		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
 			tmpl.Execute(w, LoginError{
 				ErrorMessage: "Invalid email or password",
 			})
@@ -101,7 +108,6 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	default:
 		h.errorPage(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
 	}
-
 }
 
 func (h *Handler) LogOut(w http.ResponseWriter, r *http.Request) {
@@ -111,10 +117,12 @@ func (h *Handler) LogOut(w http.ResponseWriter, r *http.Request) {
 
 	cookie, err := r.Cookie("sessionID")
 	if err != nil {
-		log.Fatal(err)
+		h.errorPage(w, http.StatusUnauthorized, err.Error())
+		return
 	}
 	if err := h.services.DeleteSessionToken(cookie.Value); err != nil {
-		log.Fatal(err)
+		h.errorPage(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	http.SetCookie(w, &http.Cookie{

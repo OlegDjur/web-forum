@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"forum/internal/models"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"text/template"
 
 	"forum/internal/service.go"
 )
@@ -26,15 +26,12 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	userRaw := r.Context().Value(ctxKeyUser)
 	user := userRaw.(models.User)
 
 	switch r.Method {
 	case http.MethodGet:
-		post := &models.Post{
-			Id: id,
-		}
+		post := &models.Post{}
 
 		index := &index{
 			User: user,
@@ -61,7 +58,6 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err = h.services.PostItem.CreatePost(post); err != nil {
-			log.Println(err)
 			if errors.Is(err, service.ErrInvalidPost) {
 				h.errorPage(w, http.StatusBadRequest, err.Error())
 				return
@@ -170,7 +166,6 @@ func (h *Handler) getCreatedPost(w http.ResponseWriter, r *http.Request) {
 	if err = tmpl.Execute(w, index); err != nil {
 		h.errorPage(w, http.StatusInternalServerError, err.Error())
 	}
-
 }
 
 func (h *Handler) getLikedPost(w http.ResponseWriter, r *http.Request) {
@@ -270,8 +265,6 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 
 	title := r.FormValue("title")
 	content := r.FormValue("content")
-
-	fmt.Println(title, content)
 
 	err = h.services.PostItem.UpdatePost(id, post.Like, post.DisLike, title, content)
 	if err != nil {

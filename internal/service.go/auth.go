@@ -123,6 +123,12 @@ func isValidUser(user *models.User) error {
 		return ErrInvalidEmail
 	}
 
+	for _, char := range user.Email {
+		if char < 33 || char > 126 {
+			return ErrInvalidUsername
+		}
+	}
+
 	for _, char := range user.Username {
 		if char < 32 || char > 126 {
 			return ErrInvalidUsername
@@ -131,6 +137,12 @@ func isValidUser(user *models.User) error {
 
 	if len(user.Username) < 2 || len(user.Username) >= 20 {
 		return ErrInvalidUsername
+	}
+
+	for _, char := range user.Password {
+		if char < 33 || char > 126 {
+			return ErrInvalidUsername
+		}
 	}
 
 	if len(user.Password) > 20 || len(user.Password) < 6 {

@@ -10,6 +10,7 @@
       href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
       rel="stylesheet"
     />
+    <link rel="shortcut icon" href="#" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
@@ -55,15 +56,7 @@
           </a>
         </li>
 
-        <li>
-          <a href="#">
-            <i class="bx bx-grid-alt"></i>
-            <span class="link_name">Dashboard</span>
-          </a>
-          <ul class="sub-menu blank">
-            <li><a class="link_name" href="#">Dashboard</a></li>
-          </ul>
-        </li>
+        
 
         <li>
           <div class="iocn-link">
@@ -75,7 +68,7 @@
           </div>
           <ul class="sub-menu">
             <li><a class="link_name" href="#">Filter</a></li>
-            <li><a href="/get-created-posts/">Date of creation</a></li>
+            <li><a href="/get-created-posts/">Created posts</a></li>
             <li>
               <a href="/get-liked-posts/">Liked post</a>
             </li>
@@ -94,13 +87,13 @@
             <li><a class="link_name" href="#">Category</a></li>
             <li><a href="/get-posts-by-category?category=Golang">Golang</a></li>
             <li>
-              <a href="get-posts-by-category?category=html&css">HTML & CSS</a>
+              <a href="/get-posts-by-category?category=Python">Python</a>
             </li>
             <li>
-              <a href="get-posts-by-category?category=JavaScript">JavaScript</a>
+              <a href="/get-posts-by-category?category=JavaScript">JavaScript</a>
             </li>
-            <li><a href="get-posts-by-category?category=Docker">Docker</a></li>
-            <li><a href="get-posts-by-category?category=SQL">SQL</a></li>
+            <li><a href="/get-posts-by-category?category=Docker">Docker</a></li>
+            <li><a href="/get-posts-by-category?category=SQL">SQL</a></li>
           </ul>
         </li>
 
@@ -124,7 +117,7 @@
     <section class="home-section">
       <div class="home-content">
         <i class="bx bx-menu"></i>
-        <span class="text">Drop Down Sidebar</span>
+        <span class="text"></span>
       </div>
       <div class="container">
         <div class="post-title">
@@ -184,7 +177,7 @@
                     <span class="icon"
                       ><i class="bx bxs-like"></i>{{ $element.Likes }}</span
                     >
-                    <!-- <span id="count" name="like"></span>Like -->
+                  
                   </button>
                 </form>
               </div>
@@ -207,15 +200,14 @@
           </div>
           {{end}} {{else}} {{range $element := .Comments}}
           <div class="comment-wrapper">
-            <div class="comment">{{.Text}}</div>
-
+            <pre class="comment">{{.Text}}</pre>
             <div class="comment-likes-wrapper">
               <div class="like">
                 <button class="like_btn">
                   <span class="icon"
                     ><i class="bx bxs-like"></i>{{ $element.Likes }}</span
                   >
-                  <!-- <span id="count" name="like"></span>Like -->
+                
                 </button>
               </div>
 
@@ -231,25 +223,26 @@
         </div>
 
         {{ if .User.ID}}
-        <form class="comment-input" action="/create-comment" method="POST">
-          <input type="hidden" name="author" value="{{.User.Username}}" />
-          <input type="hidden" name="postid" value="{{.Post.Id}}" />
-          <!-- <div class="textarea-wrapper">
-
-          </div> -->
-          <textarea
-            class="post-comments-input"
-            placeholder="Enter a message"
-            name="input"
-            id="1"
-            cols="30"
-            rows="10"
-            wrap="hard"
-          ></textarea>
-          <div class="submit">
-            <button class="button">Post Reply</button>
-          </div>
-        </form>
+        <div class="wrapper-comment">
+          <form class="comment-input" action="/create-comment" method="POST">
+            <input type="hidden" name="author" value="{{.User.Username}}" />
+            <input type="hidden" name="postid" value="{{.Post.Id}}" />
+            
+            <textarea
+              class="post-comments-input"
+              placeholder="Enter a message"
+              name="input"
+              id="1"
+              cols="30"
+              rows="10"
+              wrap="hard"
+            ></textarea>
+            <div class="submit">
+              <button class="button">Post Reply</button>
+            </div>
+          </form>
+        </div>
+        
         {{end}}
       </div>
     </section>

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/internal/models"
-	"log"
 )
 
 type Comment interface {
@@ -33,15 +32,15 @@ func (c *CommentStorage) CreateComment(comment *models.Comment) error {
 	if err != nil {
 		return err
 	}
-	lastId, err := res.LastInsertId()
+	_, err = res.LastInsertId()
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("repository: create commentary: Insert query - %w", err)
 	}
-	rowCnt, err := res.RowsAffected()
+	_, err = res.RowsAffected()
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("repository: create commentary: Insert query - %w", err)
 	}
-	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
+
 	return nil
 }
 
@@ -50,15 +49,13 @@ func (c *CommentStorage) GetComments(postID int) ([]*models.Comment, error) {
 	query := fmt.Sprintf(`SELECT * FROM comment WHERE postid = $1;`)
 	rows, err := c.db.Query(query, postID)
 	if err != nil {
-		fmt.Println("error", err)
-		return comments, err
+		return nil, fmt.Errorf("repository: get commentaries of the post: query - %w", err)
 	}
 
 	for rows.Next() {
 		c := &models.Comment{}
 		if err = rows.Scan(&c.ID, &c.Author, &c.PostID, &c.Text, &c.Likes, &c.DisLikes); err != nil {
-			fmt.Println("error 1", err)
-			return comments, err
+			return nil, fmt.Errorf("repository: get commentaries of the post: query - %w", err)
 		}
 		comments = append(comments, c)
 	}

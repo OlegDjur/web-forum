@@ -37,8 +37,7 @@ func (p *PostStorage) CreatePost(post *models.Post) error {
 	query := fmt.Sprintf(`INSERT INTO post (userid, title, content, about) values ($1, $2, $3, $4)`)
 	result, err := p.db.Exec(query, post.UserID, post.Title, post.Content, post.About)
 	if err != nil {
-		fmt.Println("error 12", err)
-		return err
+		return fmt.Errorf("storage: create post: %w", err)
 	}
 	postId, err := result.LastInsertId()
 
@@ -56,14 +55,12 @@ func (p *PostStorage) GetAllPosts() ([]models.Post, error) {
 	var posts []models.Post
 	rows, err := p.db.Query("SELECT id, userid, title, content, about FROM post")
 	if err != nil {
-		fmt.Println("error", err)
-		return posts, err
+		return nil, fmt.Errorf("storage: get all posts: query - %w", err)
 	}
 
 	for rows.Next() {
 		p := models.Post{}
 		if err = rows.Scan(&p.Id, &p.UserID, &p.Title, &p.Content, &p.About); err != nil {
-			fmt.Println("error", err)
 			return posts, err
 		}
 		posts = append(posts, p)
@@ -183,14 +180,14 @@ func (p *PostStorage) LikePost(username string, postid int) error {
 
 	_, err := p.db.Exec(query, username, postid)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("repository: like post: Insert query - %w", err)
 	}
 
 	query = `UPDATE post SET like = like + 1 WHERE id = $1;`
 
 	_, err = p.db.Exec(query, postid)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("repository: like post: Insert query - %w", err)
 	}
 
 	return nil
@@ -201,14 +198,14 @@ func (p *PostStorage) DisLikePost(username string, postid int) error {
 
 	_, err := p.db.Exec(query, username, postid)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("repository: dislike post: Insert query - %w", err)
 	}
 
 	query = `UPDATE post SET dislike = dislike + 1 WHERE id = $1;`
 
 	_, err = p.db.Exec(query, postid)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("repository: dislike post: Insert query - %w", err)
 	}
 	return err
 }
@@ -216,12 +213,12 @@ func (p *PostStorage) DisLikePost(username string, postid int) error {
 func (p *PostStorage) RemoveLikePost(id int) error {
 	stmt, err := p.db.Prepare(`UPDATE post SET like = like - 1 WHERE id = $1;`)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("repository: remove like from post: Delete query - %w", err)
 	}
 
 	_, err = stmt.Exec(id)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("repository: remove like from post: Delete query - %w", err)
 	}
 	return nil
 }
@@ -229,12 +226,12 @@ func (p *PostStorage) RemoveLikePost(id int) error {
 func (p *PostStorage) RemoveDisLikePost(id int) error {
 	stmt, err := p.db.Prepare(`UPDATE post SET dislike = dislike - 1 WHERE id = $1;`)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("repository: remove dislike from post: Delete query - %w", err)
 	}
 
 	_, err = stmt.Exec(id)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("repository: remove dislike from post: Update query - %w", err)
 	}
 	return nil
 }
@@ -244,11 +241,9 @@ func (p *PostStorage) HasUserLiked(username string, postid int) error {
 	query := `SELECT username FROM like WHERE postid=? AND username = $2`
 
 	if err := p.db.QueryRow(query, postid, username).Scan(&u); err != nil {
-		fmt.Println("has", err)
-
-		return fmt.Errorf("repository: post has like: %v", err)
+		return fmt.Errorf("repository: post has like: %w", err)
 	}
-	fmt.Println("del")
+
 	query = `DELETE FROM like WHERE postid=? AND username = $2`
 	if _, err := p.db.Exec(query, postid, username); err != nil {
 		return err
@@ -262,7 +257,7 @@ func (p *PostStorage) HasUserDislike(username string, postid int) error {
 	query := `SELECT username FROM dislike WHERE postid=? AND username = $2`
 
 	if err := p.db.QueryRow(query, postid, username).Scan(&u); err != nil {
-		return fmt.Errorf("repository: post has dislike: %v", err)
+		return fmt.Errorf("repository: post has dislike: %w", err)
 	}
 
 	query = `DELETE FROM dislike WHERE postid=? AND username = $2`

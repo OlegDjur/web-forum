@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"forum/internal/models"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,7 +12,6 @@ import (
 )
 
 func (h *Handler) createComment(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("true")
 	if r.Method != "POST" {
 		h.errorPage(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
 		return
@@ -35,7 +33,6 @@ func (h *Handler) createComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.services.CreateComment(comment); err != nil {
-		log.Println(err)
 		if errors.Is(err, service.ErrInvalidComment) {
 			h.errorPage(w, http.StatusBadRequest, err.Error())
 			return
@@ -49,43 +46,18 @@ func (h *Handler) createComment(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) likeComment(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		h.errorPage(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
 		return
 	}
 
 	commentID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/comment-like/"))
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	username := r.FormValue("username")
-
-	comment, err := h.services.GetCommentByID(commentID)
-	if err != nil {
-		fmt.Println(err)
+		h.errorPage(w, http.StatusNotFound, http.StatusText(http.StatusNotFound))
 		return
 	}
 
-	err = h.services.Comment.LikeComment(commentID, username)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("like")
-
-	http.Redirect(w, r, fmt.Sprintf("/get-post/%v", comment.PostID), 302)
-}
-
-func (h *Handler) disLikeComment(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		return
-	}
-
-	commentID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/comment-dislike/"))
-	if err != nil {
-		h.errorPage(w, http.StatusNotFound, err.Error())
-	}
-
-	username := r.FormValue("username")
+	userRaw := r.Context().Value(ctxKeyUser)
+	username := userRaw.(models.User)
 
 	comment, err := h.services.GetCommentByID(commentID)
 	if err != nil {
@@ -93,7 +65,37 @@ func (h *Handler) disLikeComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.services.Comment.DislikeComment(commentID, username)
+	err = h.services.Comment.LikeComment(commentID, username.Username)
+	if err != nil {
+		h.errorPage(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/get-post/%v", comment.PostID), 302)
+}
+
+func (h *Handler) disLikeComment(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.errorPage(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
+		return
+	}
+
+	commentID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/comment-dislike/"))
+	if err != nil {
+		h.errorPage(w, http.StatusNotFound, err.Error())
+		return
+	}
+
+	userRaw := r.Context().Value(ctxKeyUser)
+	username := userRaw.(models.User)
+
+	comment, err := h.services.GetCommentByID(commentID)
+	if err != nil {
+		h.errorPage(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = h.services.Comment.DislikeComment(commentID, username.Username)
 	if err != nil {
 		h.errorPage(w, http.StatusInternalServerError, err.Error())
 		return

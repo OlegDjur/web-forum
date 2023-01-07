@@ -17,6 +17,20 @@ body {
 
 /* ============== my style ==================== */
 
+
+
+.error-link{
+  display: block;
+  width: 50px;
+  margin: 0 auto;
+}
+
+.wrapper {
+  position: absolute;
+  margin-top: 500px;
+  left: 50%;
+}
+
 label {
   display: block;
   font-size: 18px;
@@ -65,7 +79,7 @@ a {
   font-weight: 500;
   font-size: 16px;
   line-height: 1.4;
-  max-width: 500px;
+  width:100%;
   height: 200px;
   resize: none;
 }
@@ -93,12 +107,13 @@ a {
   border: 1px solid rgb(199, 199, 199);
   border-radius: 10px;
   margin-bottom: 20px;
-  width: 500px;
+  width: 100%;
   padding: 10px;
 }
 
 .comments {
   margin-bottom: 100px;
+  max-width: 500px;
 }
 
 .likes-wrapper {
@@ -579,5 +594,9 @@ a {
   .sidebar.close ~ .home-section {
     width: 100%;
     left: 0;
+  }
+
+  .sidebar .profile-details{
+    display: none;
   }
 }

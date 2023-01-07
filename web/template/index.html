@@ -4,12 +4,13 @@
   <head>
     <meta charset="UTF-8" />
     <!--<title> Drop Down Sidebar Menu | CodingLab </title>-->
-    <link rel="stylesheet" href="../static/css/newStyle.css" />
-    <!-- Boxiocns CDN Link -->
     <link
       href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="../static/css/newStyle.css" />
+    <link rel="shortcut icon" href="#" type="image/x-icon">
+    <!-- Boxiocns CDN Link -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
@@ -29,7 +30,7 @@
             <span class="link_name">Login</span>
           </a>
           <ul class="sub-menu blank">
-            <li><a class="link_name" href="#">Login</a></li>
+            <li><a class="link_name" href="/sign-in">Login</a></li>
           </ul>
         </li>
         {{else}}
@@ -39,7 +40,7 @@
             <span class="link_name">Logout</span>
           </a>
           <ul class="sub-menu blank">
-            <li><a class="link_name" href="#">Logout</a></li>
+            <li><a class="link_name" href="/logout">Logout</a></li>
           </ul>
         </li>
 
@@ -50,7 +51,7 @@
             <span class="link_name">Home page</span>
           </a>
           <ul class="sub-menu blank">
-            <li><a class="link_name" href="#">Home page</a></li>
+            <li><a class="link_name" href="/">Home page</a></li>
           </ul>
         </li>
         {{ if .User.ID }}
@@ -60,19 +61,11 @@
             <span class="link_name">Create post</span>
           </a>
           <ul class="sub-menu blank">
-            <li><a class="link_name" href="#">Create post</a></li>
+            <li><a class="link_name" href="/create-post">Create post</a></li>
           </ul>
         </li>
 
-        <li>
-          <a href="#">
-            <i class="bx bx-grid-alt"></i>
-            <span class="link_name">Dashboard</span>
-          </a>
-          <ul class="sub-menu blank">
-            <li><a class="link_name" href="#">Dashboard</a></li>
-          </ul>
-        </li>
+        
 
         <li>
           <div class="iocn-link">
@@ -84,7 +77,7 @@
           </div>
           <ul class="sub-menu">
             <li><a class="link_name" href="#">Filter</a></li>
-            <li><a href="/get-created-posts/">Date of creation</a></li>
+            <li><a href="/get-created-posts/">Created posts</a></li>
             <li>
               <a href="/get-liked-posts/">Liked post</a>
             </li>
@@ -104,7 +97,7 @@
             <li><a class="link_name" href="#">Category</a></li>
             <li><a href="/get-posts-by-category?category=Golang">Golang</a></li>
             <li>
-              <a href="get-posts-by-category?category=html&css">HTML & CSS</a>
+              <a href="get-posts-by-category?category=Python">Python</a>
             </li>
             <li>
               <a href="get-posts-by-category?category=JavaScript">JavaScript</a>
@@ -143,7 +136,7 @@
       <div class="container">
         {{ range .Post }}
         <div class="index-post">
-          <h1><a href="/get-post/{{.Id}}">{{ .Title }}</a></h1>
+          <h1><a href="/get-post/{{.Id}}"><p style="overflow: hidden">{{ .Title }}</p></a></h1>
           <p class="post-content" style="overflow: hidden">{{ .About }}</p>
         </div>
         {{ end }}

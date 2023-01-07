@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 func NewDB() (*sql.DB, error) {
@@ -25,7 +24,6 @@ func CreateTables(db *sql.DB) error {
 			return err
 		}
 	}
-	fmt.Println(true)
 	return nil
 }
 

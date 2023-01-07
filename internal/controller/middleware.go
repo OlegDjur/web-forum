@@ -22,13 +22,21 @@ func (h *Handler) authenticateUser(next http.HandlerFunc) http.HandlerFunc {
 
 		cookie, err := r.Cookie("sessionID")
 		if err != nil {
-			http.Redirect(w, r, "/sign-in", http.StatusNotFound)
+			h.errorPage(w, http.StatusUnauthorized, err.Error())
 			return
 		}
 
 		user, err = h.services.GetSessionToken(cookie.Value)
+		if err != nil {
+			h.errorPage(w, http.StatusUnauthorized, err.Error())
+			return
+		}
 
 		if user.ExpiresAt.Before(time.Now()) {
+			if err := h.services.DeleteSessionToken(cookie.Value); err != nil {
+				h.errorPage(w, http.StatusUnauthorized, err.Error())
+				return
+			}
 			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, models.User{})))
 			return
 		}

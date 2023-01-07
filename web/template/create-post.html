@@ -10,6 +10,7 @@
     href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
     rel="stylesheet"
   />
+  <link rel="shortcut icon" href="#" type="image/x-icon">
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../static/css/virtual-select.min.css">
@@ -38,21 +39,24 @@
             <span class="link_name">Logout</span>
           </a>
         </li>
-        {{end}} {{ if .User.ID }}
+        {{end}}
+        <li>
+          <a href="/">
+            <i class="bx bx-home"></i>
+            <span class="link_name">Home page</span>
+          </a>
+          <ul class="sub-menu blank">
+            <li><a class="link_name" href="/">Home page</a></li>
+          </ul>
+        </li>
+        {{ if .User.ID }}
         <li class="write">
           <a href="/create-post">
             <i class="bx bx-edit"></i>
             <span class="link_name">Create post</span>
           </a>
-        </li>
-
-        <li>
-          <a href="#">
-            <i class="bx bx-grid-alt"></i>
-            <span class="link_name">Dashboard</span>
-          </a>
           <ul class="sub-menu blank">
-            <li><a class="link_name" href="#">Dashboard</a></li>
+            <li><a class="link_name" href="/create-post">Create post</a></li>
           </ul>
         </li>
 
@@ -86,7 +90,7 @@
             <li><a class="link_name" href="#">Category</a></li>
             <li><a href="/get-posts-by-category?category=Golang">Golang</a></li>
             <li>
-              <a href="get-posts-by-category?category=html&css">HTML & CSS</a>
+              <a href="get-posts-by-category?category=Python">Python</a>
             </li>
             <li>
               <a href="get-posts-by-category?category=JavaScript">JavaScript</a>
@@ -118,7 +122,7 @@
     <section class="home-section">
       <div class="home-content">
         <i class="bx bx-menu"></i>
-        <span class="text">Drop Down Sidebar</span>
+        <span class="text"></span>
       </div>
       <div class="container">
        
@@ -133,7 +137,7 @@
                   <select id="multipleSelect" multiple name="category" placeholder="Native Select" data-search="false" data-silent-initial-value-set="true" required>
                     <option value="Golang">Golang</option>
                     <option value="JavaScript">JavaScript</option>
-                    <option value="Pytjon">Option 3</option>
+                    <option value="Python">Python</option>
                     <option value="Docker">Docker</option>
                     <option value="SQL">SQL</option>
                   </select>
@@ -162,7 +166,7 @@
               <textarea
                 class="create-description create-input"
                 aria-label="With textarea"
-                resize: "none"
+                resize="none"
                 name="about"
                 required
                 style="height: 150px"></textarea>
@@ -198,36 +202,6 @@
       sidebarBtn.addEventListener("click", () => {
         sidebar.classList.toggle("close");
       });
-      // const optionMenu = document.querySelector(".select-menu"),
-      //       selectBtn = optionMenu.querySelector(".select-btn"),
-      //       options = optionMenu.querySelectorAll(".option"),
-      //       sBtn_text = optionMenu.querySelector(".sBtn-text"),
-      //       input_category = optionMenu.querySelector("#category");
-
-      // selectBtn.addEventListener("click", () => optionMenu.classList.toggle("active"))
-
-      // options.forEach(option =>{
-      //   option.addEventListener("click", () =>{
-      //     let selectedOption = option.querySelector(".option-text").innerText;
-      //     sBtn_text.innerText = selectedOption;
-      //     input_category.value = selectedOption;
-      //     optionMenu.classList.toggle("active")
-      //   })
-      // })
-
-      // let arrow = document.querySelectorAll(".arrow");
-      // for (var i = 0; i < arrow.length; i++) {
-      //   arrow[i].addEventListener("click", (e) => {
-      //     let arrowParent = e.target.parentElement.parentElement; //selecting main parent of arrow
-      //     arrowParent.classList.remove("showMenu");
-      //   });
-      // }
-      // let sidebar = document.querySelector(".sidebar");
-      // let sidebarBtn = document.querySelector(".bx-menu");
-      // console.log(sidebarBtn);
-      // sidebarBtn.addEventListener("click", () => {
-      //   sidebar.classList.toggle("close");
-      // });
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
