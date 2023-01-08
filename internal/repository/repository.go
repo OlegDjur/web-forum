@@ -1,8 +1,6 @@
 package repository
 
-import (
-	"database/sql"
-)
+import "github.com/jmoiron/sqlx"
 
 type Repository struct {
 	Authorization
@@ -10,7 +8,7 @@ type Repository struct {
 	Comment
 }
 
-func NewRepository(db *sql.DB) *Repository {
+func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthSqlite(db),
 		PostItem:      NewPostSqlite(db),

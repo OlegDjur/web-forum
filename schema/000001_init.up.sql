@@ -1,0 +1,49 @@
+CREATE TABLE IF NOT EXISTS users (
+	id SERIAL PRIMARY KEY,
+	email TEXT UNIQUE,
+	username TEXT UNIQUE,
+	password TEXT,
+	token TEXT DEFAULT NULL,
+	expiresAt TIMESTAMP DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS post (
+	id SERIAL PRIMARY KEY,
+	userid INTEGER,
+	title TEXT,
+	content TEXT,
+	about TEXT,
+	category TEXT,
+	likes INTEGER DEFAULT 0,
+	dislike INTEGER DEFAULT 0,
+	userliked INTEGER Default 0
+);
+
+CREATE TABLE IF NOT EXISTS post_category (
+	postID INTEGER,
+	category TEXT,
+	FOREIGN KEY (postID) REFERENCES post(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS comment (
+	id SERIAL PRIMARY KEY,
+	author TEXT,
+	postid INTEGER,
+	text TEXT,
+	likes INTEGER DEFAULT 0,
+	dislike INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS likes (
+	id SERIAL PRIMARY KEY,
+	username TEXT,
+	postid INTEGER,
+	commentId INTEGER DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS dislike(
+	id SERIAL PRIMARY KEY,
+	username TEXT,
+	postid INTEGER,
+	commentId INTEGER DEFAULT NULL
+);

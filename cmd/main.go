@@ -1,6 +1,7 @@
 package main
 
 import (
+	"forum/database"
 	"forum/internal/controller"
 	"forum/internal/repository"
 	"log"
@@ -9,6 +10,7 @@ import (
 
 	"forum/internal/service.go"
 
+	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -17,18 +19,20 @@ type Server struct {
 }
 
 func main() {
-	db, err := repository.NewDB()
-	defer db.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+	postgres := database.NewDB()
 
-	if err = repository.CreateTables(db); err != nil {
-		log.Fatal(err)
-	}
+	// db, err := repository.NewDB()
+	// defer db.Close()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer db.Close()
 
-	repos := repository.NewRepository(db)
+	// if err = repository.CreateTables(db); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	repos := repository.NewRepository(postgres)
 	services := service.NewService(repos)
 	handler := controller.NewHandler(services)
 

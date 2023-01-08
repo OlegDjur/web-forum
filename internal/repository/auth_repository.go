@@ -1,10 +1,11 @@
 package repository
 
 import (
-	"database/sql"
 	"fmt"
 	"forum/internal/models"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type Authorization interface {
@@ -17,15 +18,15 @@ type Authorization interface {
 }
 
 type AuthStorage struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewAuthSqlite(db *sql.DB) *AuthStorage {
+func NewAuthSqlite(db *sqlx.DB) *AuthStorage {
 	return &AuthStorage{db: db}
 }
 
 func (r *AuthStorage) CreateUser(user *models.User) error {
-	query := fmt.Sprintf("INSERT INTO user (username, email, password) values ($1, $2, $3)")
+	query := fmt.Sprintf("INSERT INTO users (username, email, password) values ($1, $2, $3)")
 	_, err := r.db.Exec(query, user.Username, user.Email, user.Password)
 	if err != nil {
 		return err
@@ -35,7 +36,7 @@ func (r *AuthStorage) CreateUser(user *models.User) error {
 }
 
 func (s *AuthStorage) GetUserByEmail(email string) (models.User, error) {
-	query := `SELECT id, email, username, password FROM user WHERE email=$1;`
+	query := `SELECT id, email, username, password FROM users WHERE email=$1;`
 	row := s.db.QueryRow(query, email)
 	var user models.User
 	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password)
@@ -46,7 +47,7 @@ func (s *AuthStorage) GetUserByEmail(email string) (models.User, error) {
 }
 
 func (s *AuthStorage) GetUserByUsername(username string) (models.User, error) {
-	query := `SELECT id, email, username, password FROM user WHERE username=$1;`
+	query := `SELECT id, email, username, password FROM users WHERE username=$1;`
 	row := s.db.QueryRow(query, username)
 	var user models.User
 	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password)
@@ -57,7 +58,7 @@ func (s *AuthStorage) GetUserByUsername(username string) (models.User, error) {
 }
 
 func (s *AuthStorage) AddSessionToken(email, token string, expiresAt time.Time) error {
-	query := `UPDATE user SET token = $1, expiresAt = $2 WHERE email = $3;`
+	query := `UPDATE users SET token = $1, expiresAt = $2 WHERE email = $3;`
 	_, err := s.db.Exec(query, token, expiresAt, email)
 	if err != nil {
 		return fmt.Errorf("storage: save session token: %w", err)
@@ -66,7 +67,7 @@ func (s *AuthStorage) AddSessionToken(email, token string, expiresAt time.Time) 
 }
 
 func (s *AuthStorage) GetSessionToken(token string) (models.User, error) {
-	query := `SELECT id, email, username, password, token, expiresAt FROM user WHERE token=$1;`
+	query := `SELECT id, email, username, password, token, expiresAt FROM users WHERE token=$1;`
 
 	row := s.db.QueryRow(query, token)
 	var user models.User
@@ -78,7 +79,7 @@ func (s *AuthStorage) GetSessionToken(token string) (models.User, error) {
 }
 
 func (s *AuthStorage) DeleteSessionToken(token string) error {
-	query := `UPDATE user SET token = NULL, expiresAt = NULL WHERE token = $1;`
+	query := `UPDATE users SET token = NULL, expiresAt = NULL WHERE token = $1;`
 	_, err := s.db.Exec(query, token)
 	if err != nil {
 		return fmt.Errorf("storage: delete session token: %w", err)

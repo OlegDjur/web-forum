@@ -1,9 +1,10 @@
 package repository
 
 import (
-	"database/sql"
 	"fmt"
 	"forum/internal/models"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type Comment interface {
@@ -19,10 +20,10 @@ type Comment interface {
 }
 
 type CommentStorage struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewCommentSqlite(db *sql.DB) *CommentStorage {
+func NewCommentSqlite(db *sqlx.DB) *CommentStorage {
 	return &CommentStorage{db: db}
 }
 
@@ -66,7 +67,7 @@ func (c *CommentStorage) GetComments(postID int) ([]*models.Comment, error) {
 func (c *CommentStorage) GetCommentByID(commentID int) (models.Comment, error) {
 	var comment models.Comment
 
-	query := `SELECT id, postid, author, text, like, dislike FROM comment WHERE id=$1;`
+	query := `SELECT id, postid, author, text, likes, dislike FROM comment WHERE id=$1;`
 	row := c.db.QueryRow(query, commentID)
 
 	err := row.Scan(&comment.ID, &comment.PostID, &comment.Author, &comment.Text, &comment.Likes, &comment.DisLikes)
@@ -78,12 +79,12 @@ func (c *CommentStorage) GetCommentByID(commentID int) (models.Comment, error) {
 }
 
 func (s *CommentStorage) RemoveLikeComment(commentID int, username string) error {
-	query := `DELETE FROM like WHERE commentId = $1 AND username = $2;`
+	query := `DELETE FROM likes WHERE commentId = $1 AND username = $2;`
 	_, err := s.db.Exec(query, commentID, username)
 	if err != nil {
 		return fmt.Errorf("storage: remove like from comment: %w", err)
 	}
-	query = `UPDATE comment SET like = like - 1 WHERE id = $1;`
+	query = `UPDATE comment SET likes = likes - 1 WHERE id = $1;`
 	_, err = s.db.Exec(query, commentID)
 	if err != nil {
 		return fmt.Errorf("storage: remove like from comment: %w", err)
@@ -107,7 +108,7 @@ func (s *CommentStorage) RemoveDislikeComment(commentID int, username string) er
 
 func (s *CommentStorage) CommentHasLike(commentID int, username string) error {
 	var u, query string
-	query = `SELECT username FROM like WHERE commentId = $1 AND username = $2;`
+	query = `SELECT username FROM likes WHERE commentId = $1 AND username = $2;`
 	err := s.db.QueryRow(query, commentID, username).Scan(&u)
 	if err != nil {
 		return fmt.Errorf("storage: comment has like: %w", err)
@@ -126,12 +127,12 @@ func (s *CommentStorage) CommentHasDislike(commentID int, username string) error
 }
 
 func (s *CommentStorage) LikeComment(commentID int, username string) error {
-	query := `INSERT INTO like(commentId, username) VALUES ($1, $2);`
+	query := `INSERT INTO likes(commentId, username) VALUES ($1, $2);`
 	_, err := s.db.Exec(query, commentID, username)
 	if err != nil {
 		return fmt.Errorf("storage: like comment: %w", err)
 	}
-	query = `UPDATE comment SET like = like + 1  WHERE id = $1;`
+	query = `UPDATE comment SET likes = likes + 1  WHERE id = $1;`
 	_, err = s.db.Exec(query, commentID)
 	if err != nil {
 		return fmt.Errorf("storage: like comment: %w", err)

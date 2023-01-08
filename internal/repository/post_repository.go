@@ -1,10 +1,11 @@
 package repository
 
 import (
-	"database/sql"
 	"fmt"
 	"forum/internal/models"
 	"log"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type PostItem interface {
@@ -26,10 +27,10 @@ type PostItem interface {
 }
 
 type PostStorage struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewPostSqlite(db *sql.DB) *PostStorage {
+func NewPostSqlite(db *sqlx.DB) *PostStorage {
 	return &PostStorage{db: db}
 }
 
