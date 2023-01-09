@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  restfullapi:
+    restart: on-failure
+    build: .
+    # command: ./wait-for-postgres.sh postgres /app/main
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      - DB_PASSWORD=qwerty
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: qwerty
+      POSTGRES_USER: postgres

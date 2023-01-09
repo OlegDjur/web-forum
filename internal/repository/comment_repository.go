@@ -29,17 +29,9 @@ func NewCommentSqlite(db *sqlx.DB) *CommentStorage {
 
 func (c *CommentStorage) CreateComment(comment *models.Comment) error {
 	query := fmt.Sprintf(`INSERT INTO comment (author, text, postid) values ($1, $2, $3)`)
-	res, err := c.db.Exec(query, comment.Author, comment.Text, comment.PostID)
+	_, err := c.db.Exec(query, comment.Author, comment.Text, comment.PostID)
 	if err != nil {
 		return err
-	}
-	_, err = res.LastInsertId()
-	if err != nil {
-		return fmt.Errorf("repository: create commentary: Insert query - %w", err)
-	}
-	_, err = res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("repository: create commentary: Insert query - %w", err)
 	}
 
 	return nil
@@ -47,7 +39,7 @@ func (c *CommentStorage) CreateComment(comment *models.Comment) error {
 
 func (c *CommentStorage) GetComments(postID int) ([]*models.Comment, error) {
 	var comments []*models.Comment
-	query := fmt.Sprintf(`SELECT * FROM comment WHERE postid = $1;`)
+	query := fmt.Sprintf(`SELECT * FROM comment WHERE postid = $1 order by id asc;`)
 	rows, err := c.db.Query(query, postID)
 	if err != nil {
 		return nil, fmt.Errorf("repository: get commentaries of the post: query - %w", err)
