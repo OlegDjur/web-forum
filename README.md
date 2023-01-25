@@ -8,10 +8,7 @@ This project consists in creating a web forum that allows:
 - Filtering posts.
 
 To run project:
-1. `git clone git@git.01.alem.school:Oleg_Dzhur/forum.git`
-
-2. Write in terminal and wait for 5-10 seconds:
-`go run ./cmd`
+ `docker-compose up --build -d`
 
 - Clients  able to **REGISTER** as a new user on the forum, by inputting their credentials.
 - After that, they are able to **LOGIN** to access the forum and be able to add **posts** and **comments**.
