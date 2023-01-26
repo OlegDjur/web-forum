@@ -4,13 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"forum/internal/models"
+	"forum/internal/service"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"forum/internal/service.go"
 )
 
 type index struct {

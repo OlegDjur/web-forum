@@ -1,9 +1,8 @@
 package controller
 
 import (
+	"forum/internal/service"
 	"net/http"
-
-	"forum/internal/service.go"
 )
 
 type Handler struct {

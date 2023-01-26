@@ -4,11 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"forum/internal/models"
+	"forum/internal/service"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"forum/internal/service.go"
 )
 
 func (h *Handler) createComment(w http.ResponseWriter, r *http.Request) {

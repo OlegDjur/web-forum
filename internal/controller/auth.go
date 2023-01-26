@@ -3,12 +3,11 @@ package controller
 import (
 	"errors"
 	"forum/internal/models"
+	"forum/internal/service"
 	"html/template"
 	"log"
 	"net/http"
 	"time"
-
-	"forum/internal/service.go"
 )
 
 type RegisterError struct {
