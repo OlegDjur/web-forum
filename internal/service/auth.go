@@ -6,7 +6,7 @@ import (
 	"forum/internal/models"
 	"forum/internal/repository"
 	"net/http"
-	"net/mail"
+	"regexp"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -118,8 +118,9 @@ func generateHashPassword(password string) (string, error) {
 }
 
 func isValidUser(user *models.User) error {
-	_, err := mail.ParseAddress(user.Email)
-	if err != nil {
+	validEmail := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	if ok := validEmail.MatchString(user.Email); !ok {
+
 		return ErrInvalidEmail
 	}
 
