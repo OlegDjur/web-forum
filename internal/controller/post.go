@@ -65,7 +65,7 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Redirect(w, r, "/", 302)
+		http.Redirect(w, r, "/", http.StatusFound)
 	default:
 		h.errorPage(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
 	}
@@ -79,7 +79,11 @@ func (h *Handler) getPostsByCategory(w http.ResponseWriter, r *http.Request) {
 
 	tmpl := template.Must(template.ParseFiles("web/template/index.html"))
 
-	user := h.services.Authorization.GetSessionTokenFromRequest(r)
+	user, err := h.services.Authorization.GetSessionTokenFromRequest(r)
+	if err != nil {
+		h.errorPage(w, http.StatusUnauthorized, err.Error())
+		return
+	}
 
 	category := r.URL.Query().Get("category")
 
@@ -112,7 +116,11 @@ func (h *Handler) getPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := h.services.Authorization.GetSessionTokenFromRequest(r)
+	user, err := h.services.Authorization.GetSessionTokenFromRequest(r)
+	if err != nil {
+		h.errorPage(w, http.StatusUnauthorized, err.Error())
+		return
+	}
 
 	postID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/get-post/"))
 	if err != nil {
@@ -215,7 +223,7 @@ func (h *Handler) likePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/get-post/%v", id), 302)
+	http.Redirect(w, r, fmt.Sprintf("/get-post/%v", id), http.StatusFound)
 }
 
 func (h *Handler) disLikePost(w http.ResponseWriter, r *http.Request) {
@@ -232,7 +240,7 @@ func (h *Handler) disLikePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/get-post/%v", id), 302)
+	http.Redirect(w, r, fmt.Sprintf("/get-post/%v", id), http.StatusFound)
 }
 
 func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
@@ -271,7 +279,7 @@ func (h *Handler) updatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
@@ -286,5 +294,5 @@ func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
