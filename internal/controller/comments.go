@@ -40,7 +40,7 @@ func (h *Handler) createComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/get-post/%d", postID), 302)
+	http.Redirect(w, r, fmt.Sprintf("/get-post/%d", postID), http.StatusFound)
 }
 
 func (h *Handler) likeComment(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +70,7 @@ func (h *Handler) likeComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/get-post/%v", comment.PostID), 302)
+	http.Redirect(w, r, fmt.Sprintf("/get-post/%v", comment.PostID), http.StatusFound)
 }
 
 func (h *Handler) disLikeComment(w http.ResponseWriter, r *http.Request) {
@@ -100,5 +100,5 @@ func (h *Handler) disLikeComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/get-post/%v", comment.PostID), 302)
+	http.Redirect(w, r, fmt.Sprintf("/get-post/%v", comment.PostID), http.StatusFound)
 }
