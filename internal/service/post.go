@@ -154,11 +154,7 @@ func isValidPost(post *models.Post) error {
 		return errors.New("title length out of range")
 	}
 
-	if len(post.About) > 300 {
-		return errors.New("content length out of range")
-	}
-
-	if len(post.Content) > 1500 {
+	if len(post.About) > 500 {
 		return errors.New("content length out of range")
 	}
 

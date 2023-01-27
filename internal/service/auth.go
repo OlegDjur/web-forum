@@ -25,7 +25,7 @@ type Authorization interface {
 	CreateUser(user *models.User) error
 	GenerateSessionToken(email, password string) (string, time.Time, error)
 	GetSessionToken(token string) (models.User, error)
-	GetSessionTokenFromRequest(r *http.Request) models.User
+	GetSessionTokenFromRequest(r *http.Request) (models.User, error)
 	DeleteSessionToken(token string) error
 }
 
@@ -76,6 +76,9 @@ func (s *AuthService) GenerateSessionToken(email, password string) (string, time
 	expiresAt := time.Now().Add(time.Hour * 12)
 
 	err = s.repo.AddSessionToken(email, token, expiresAt)
+	if err != nil {
+		return "", time.Time{}, err
+	}
 
 	return token, expiresAt, nil
 }
@@ -89,18 +92,21 @@ func (s *AuthService) GetSessionToken(token string) (models.User, error) {
 	return user, nil
 }
 
-func (s *AuthService) GetSessionTokenFromRequest(r *http.Request) models.User {
+func (s *AuthService) GetSessionTokenFromRequest(r *http.Request) (models.User, error) {
 	cookie, err := r.Cookie("sessionID")
 	if err != nil {
-		return models.User{}
+		return models.User{}, err
 	}
 
 	user, err := s.repo.GetSessionToken(cookie.Value)
+	if err != nil {
+		return models.User{}, err
+	}
 
 	if user.ExpiresAt.Before(time.Now()) {
-		return models.User{}
+		return models.User{}, err
 	}
-	return user
+	return user, nil
 }
 
 func (s *AuthService) DeleteSessionToken(token string) error {
@@ -112,15 +118,17 @@ func (s *AuthService) DeleteSessionToken(token string) error {
 }
 
 func generateHashPassword(password string) (string, error) {
-	hashedPassword, hashingError := bcrypt.GenerateFromPassword([]byte(password), 10)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return "", err
+	}
 
-	return string(hashedPassword), hashingError
+	return string(hashedPassword), nil
 }
 
 func isValidUser(user *models.User) error {
 	validEmail := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	if ok := validEmail.MatchString(user.Email); !ok {
-
 		return ErrInvalidEmail
 	}
 

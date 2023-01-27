@@ -23,7 +23,11 @@ func (h *Handler) indexPage(w http.ResponseWriter, r *http.Request) {
 
 	tmpl := template.Must(template.ParseFiles("web/template/index.html"))
 
-	user := h.services.Authorization.GetSessionTokenFromRequest(r)
+	user, err := h.services.Authorization.GetSessionTokenFromRequest(r)
+	if err != nil {
+		h.errorPage(w, http.StatusUnauthorized, err.Error())
+		return
+	}
 
 	posts, err := h.services.PostItem.GetAllPosts()
 	if err != nil {
